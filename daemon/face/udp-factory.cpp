@@ -255,11 +255,11 @@ UdpFactory::doCreateFace(const CreateFaceRequest& req,
   udp::Endpoint endpoint(ip::address::from_string(req.remoteUri.getHost()),
                          boost::lexical_cast<uint16_t>(req.remoteUri.getPort()));
 
-  if (endpoint.address().is_multicast()) {
-    NFD_LOG_TRACE("createFace does not support multicast faces");
-    onFailure(406, "Cannot create multicast UDP faces");
-    return;
-  }
+//  if (endpoint.address().is_multicast()) {
+//    NFD_LOG_TRACE("createFace does not support multicast faces");
+//    onFailure(406, "Cannot create multicast UDP faces");
+//    return;
+//  }
 
   if (req.params.wantLocalFields) {
     // UDP faces are never local
@@ -428,15 +428,44 @@ UdpFactory::applyMcastConfigToNetif(const shared_ptr<const net::NetworkInterface
     return {};
   }
 
-  NFD_LOG_DEBUG("Creating multicast faces on " << netif->getName());
+  NFD_LOG_DEBUG("applyMcastConfigToNetif: Creating multicast faces on " << netif->getName());
 
   std::vector<shared_ptr<Face>> faces;
   for (const auto& addr : addrs) {
+    NFD_LOG_DEBUG("applyMcastConfigToNetif: multicast addr creating " << addr);
     auto face = this->createMulticastFace(netif, addr,
                                           addr.is_v4() ? m_mcastConfig.group : m_mcastConfig.groupV6);
     if (face->getId() == INVALID_FACEID) {
       // new face: register with forwarding
       this->addFace(face);
+    }
+    if(addr.is_v4()){
+        NFD_LOG_DEBUG("ZJH: Testing multicast face creating 224.5.0.2 " << netif->getName());
+        boost::system::error_code ec;
+        int16_t mcastport = 50002;
+        m_mcastConfig.group.address(ip::address_v4::from_string("224.5.0.2", ec));
+        m_mcastConfig.group.port(mcastport);
+        face = this->createMulticastFace(netif, addr, m_mcastConfig.group);
+        if (face->getId() == INVALID_FACEID) {
+            // new face: register with forwarding
+            this->addFace(face);
+        }
+        NFD_LOG_DEBUG("ZJH: Testing multicast face creating 224.5.0.3 " << netif->getName());
+        mcastport = 50003;
+        m_mcastConfig.group.address(ip::address_v4::from_string("224.5.0.3", ec));
+        m_mcastConfig.group.port(mcastport);
+        face = this->createMulticastFace(netif, addr, m_mcastConfig.group);
+        if (face->getId() == INVALID_FACEID) {
+            this->addFace(face);
+        }
+        NFD_LOG_DEBUG("ZJH: Testing multicast face creating 224.5.0.4 " << netif->getName());
+        mcastport = 50004;
+        m_mcastConfig.group.address(ip::address_v4::from_string("224.5.0.4", ec));
+        m_mcastConfig.group.port(mcastport);
+        face = this->createMulticastFace(netif, addr, m_mcastConfig.group);
+        if (face->getId() == INVALID_FACEID) {
+            this->addFace(face);
+        }
     }
     faces.push_back(std::move(face));
   }
@@ -462,9 +491,9 @@ UdpFactory::applyMcastConfig(const FaceSystem::ConfigContext&)
   }
 
   // destroy old faces that are not needed in new configuration
-  for (const auto& face : facesToClose) {
-    face->close();
-  }
+//  for (const auto& face : facesToClose) {
+//    face->close();
+//  }
 }
 
 } // namespace face

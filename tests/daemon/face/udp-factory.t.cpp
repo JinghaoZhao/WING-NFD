@@ -1042,12 +1042,12 @@ BOOST_AUTO_TEST_CASE(UnsupportedCreateFace)
              {CreateFaceExpectedResult::FAILURE, 406,
               "Outgoing UDP faces do not support on-demand persistency"});
 
-  createFace(factory,
-             FaceUri("udp4://233.252.0.1:23252"),
-             {},
-             {ndn::nfd::FACE_PERSISTENCY_PERSISTENT, {}, {}, {}, false, false, false},
-             {CreateFaceExpectedResult::FAILURE, 406,
-              "Cannot create multicast UDP faces"});
+//  createFace(factory,
+//             FaceUri("udp4://233.252.0.1:23252"),
+//             {},
+//             {ndn::nfd::FACE_PERSISTENCY_PERSISTENT, {}, {}, {}, false, false, false},
+//             {CreateFaceExpectedResult::FAILURE, 406,
+//              "Cannot create multicast UDP faces"});
 
   createFace(factory,
              FaceUri("udp4://127.0.0.1:20072"),
