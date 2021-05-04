@@ -72,7 +72,7 @@ void
 ForwarderStatusManager::listGeneralStatus(const Name& topPrefix, const Interest& interest,
                                           ndn::mgmt::StatusDatasetContext& context)
 {
-  context.setExpiry(STATUS_FRESHNESS);
+//  context.setExpiry(STATUS_FRESHNESS);
 
   auto status = this->collectGeneralStatus();
   const Block& wire = status.wireEncode();
